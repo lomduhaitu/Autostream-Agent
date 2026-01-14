@@ -28,7 +28,8 @@ This project implements a **Conversational AI Agent** for *AutoStream*, a video 
 **1. Clone the Repository**
 ```bash
 git clone <your-repo-url-here>
-cd AutoStream-Agent'''bash
+cd AutoStream-Agent
+```
 
 **2. Create & Activate Virtual Environment Windows:**
 python -m venv venv
