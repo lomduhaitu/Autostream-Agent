@@ -32,25 +32,35 @@ cd AutoStream-Agent
 ```
 
 **2. Create & Activate Virtual Environment Windows:**
+```bash
 python -m venv venv
 .\venv\Scripts\activate
+```
 
 Mac: 
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 
 **3. Install Dependencies**
+```bash
 pip install -r requirements.txt
+```
 
 **4. Configure Environment Variables Create a .env file in the root directory and add your Google API key**
 GOOGLE_API_KEY=AIzaSy...Your_Key_Here
 
 **Usage**
 Option A: Web Interface (Recommended for Demo) Runs a polished chat UI using Streamlit.
+```bash
 streamlit run app.py
+```
 
 Option B: CLI Mode (Terminal) Runs the agent directly in your command line for debugging.
+```bash
 python main.py
+```
 
 **3. Architecture Explanation**
 
