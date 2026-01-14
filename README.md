@@ -49,6 +49,7 @@ pip install -r requirements.txt
 ```
 
 **4. Configure Environment Variables Create a .env file in the root directory and add your Google API key**
+
 GOOGLE_API_KEY=AIzaSy...Your_Key_Here
 
 **Usage**
@@ -66,6 +67,7 @@ python main.py
 
 
 Why LangGraph?
+
 For this workflow, I chose LangGraph over standard linear chains (LangChain) or AutoGen. The "Social-to-Lead" problem requires a cyclic state machine rather than a linear pipeline.
 
 Cyclic Behavior: Real conversations are non-linear. If a user provides an invalid email or forgets to mention their platform, the agent must "loop back" and ask specifically for that missing piece of data. Standard DAGs (Directed Acyclic Graphs) struggle with these dynamic loops.
