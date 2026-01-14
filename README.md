@@ -1,92 +1,91 @@
-**Social-to-Lead AI Agent (Inflx)**
-**Company: ServiceHive | Product: Inflx**
+# Social-to-Lead AI Agent (Inflx)
 
-1. Project Overview
-This project implements a Conversational AI Agent for video editing platform. The agent is designed to:
+**Company:** ServiceHive | **Product:** Inflx  
+**Role:** Machine Learning Intern Assignment  
+**Author:** Vaishnav Bhor
 
-Answer Questions: Uses RAG (Retrieval-Augmented Generation) to answer pricing and policy questions from a local knowledge base.
+---
 
-Detect Intent: Distinguishes between casual queries and high-intent buying signals.
+## 1. Project Overview
 
-Capture Leads: Intelligently collects user details (Name, Email, Platform) and executes a lead capture tool only when all information is gathered.
+This project implements a **Conversational AI Agent** for *AutoStream*, a video editing SaaS platform. The agent is built to automate the top-of-funnel sales process by acting as a knowledgeable representative.
 
-2. How to Run Locally
-Prerequisites
-Python 3.9+
+**Key Capabilities:**
+* **🤖 Answer Questions:** Uses **RAG (Retrieval-Augmented Generation)** to fetch accurate pricing, policy, and feature information from a local knowledge base (`knowledge_base.md`).
+* **🧠 Detect Intent:** Intelligently distinguishes between casual inquiries and **high-intent buying signals**.
+* **🎣 Capture Leads:** Automatically switches context to collect specific user details (Name, Email, Creator Platform) and executes a backend lead capture tool only when all slots are filled.
 
-A Google AI Studio API Key (for Gemini 1.5 Flash)
+---
 
-Installation Steps
-1. Clone the Repository
+## 2. How to Run Locally
 
-Bash
+### Prerequisites
+* **Python 3.9+**
+* **Google AI Studio API Key** (for Gemini 1.5 Flash)
 
-git clone <repository-url>
-2. Set directory
+### Installation Steps
 
+**1. Clone the Repository**
+```bash
+git clone <your-repo-url-here>
 cd AutoStream-Agent
-Create & Activate Virtual Environment
 
-Bash
-
-# Windows
+**2. Create & Activate Virtual Environment Windows:**
 python -m venv venv
 .\venv\Scripts\activate
 
-# Mac/Linux
+Mac: 
 python3 -m venv venv
 source venv/bin/activate
-Install Dependencies
 
-Bash
-
+**3. Install Dependencies**
 pip install -r requirements.txt
-Configure Environment Variables Create a .env file in the root directory and add your API key:
 
-Code snippet
-
+**4. Configure Environment Variables Create a .env file in the root directory and add your Google API key**
 GOOGLE_API_KEY=AIzaSy...Your_Key_Here
-Running the Agent
+
+**Usage**
 Option A: Web Interface (Recommended for Demo) Runs a polished chat UI using Streamlit.
-
-Bash
-
 streamlit run app.py
-Option B: CLI Mode (Terminal) Runs the agent directly in your command line.
 
-Bash
-
+Option B: CLI Mode (Terminal) Runs the agent directly in your command line for debugging.
 python main.py
-3. Architecture Explanation
-Why LangGraph? For this workflow, I chose LangGraph over standard linear chains (LangChain) or AutoGen. The "Social-to-Lead" problem requires a cyclic state machine rather than a straight line.
 
-Cyclic Behavior: If a user provides an invalid email or misses a specific slot (e.g., forgets to mention their platform), the agent must loop back and ask again. Standard chains are Directed Acyclic Graphs (DAGs) and struggle with these dynamic loops.
+**3. Architecture Explanation**
 
-Control: LangGraph provides fine-grained control over the "Reasoning Loop," allowing the agent to decide whether to call a tool (RAG/Lead Capture) or respond to the user based on the current context, rather than following a hard-coded set of steps.
 
-State Management State is persisted using LangGraph’s MemorySaver checkpointer.
+Why LangGraph?
+For this workflow, I chose LangGraph over standard linear chains (LangChain) or AutoGen. The "Social-to-Lead" problem requires a cyclic state machine rather than a linear pipeline.
+
+Cyclic Behavior: Real conversations are non-linear. If a user provides an invalid email or forgets to mention their platform, the agent must "loop back" and ask specifically for that missing piece of data. Standard DAGs (Directed Acyclic Graphs) struggle with these dynamic loops.
+
+Fine-Grained Control: LangGraph allows the agent to decide the next step dynamically—choosing whether to call the RAG tool, the Lead Capture tool, or simply reply with text—based on the current conversation state.
+
+State Management
+State is persisted using LangGraph’s MemorySaver checkpointer.
 
 Mechanism: The graph maintains a messages list within its state. Every user input and AI response is appended to this history.
 
-Persistence: A unique thread_id is assigned to every user session. This allows the LLM to access the full conversation context (short-term memory) to determine which slots (Name, Email, Platform) have already been filled and which remain missing, ensuring a natural, multi-turn conversation without data loss.
+Persistence: A unique thread_id is assigned to every user session. This acts as "Short-Term Memory," allowing the LLM to recall previous turns (e.g., remembering the user's name mentioned 3 messages ago) to fill the required lead slots without asking redundant questions.
 
-4. WhatsApp Deployment Strategy
+
+**4. WhatsApp Deployment Strategy**
+
+
 To deploy this agent on WhatsApp, I would integrate it using the Meta Cloud API and a FastAPI middleware.
 
-Architecture: WhatsApp User -> Meta Cloud -> FastAPI Webhook -> LangGraph Agent -> Response
+**Architecture Flow**
+WhatsApp User → Meta Cloud → FastAPI Webhook → LangGraph Agent → Response
 
-Implementation Steps:
+**Implementation Plan**
+1. Webhook Setup: Develop a Python FastAPI application with a POST /webhook endpoint. This endpoint verifies the Meta verification token and receives incoming messages.
 
-Webhook Setup: Develop a Python FastAPI application with a POST /webhook endpoint. This endpoint will be verified and registered in the Meta Developer Portal.
+2. Message Handling: When a webhook event triggers, the system extracts the JSON payload:
 
-Message Handling: When a user sends a message, Meta sends a JSON payload to the webhook.
+3. Identity: The user's phone number (wa_id) is extracted.
 
-Extract: Parse the user's phone number (wa_id) and text body.
+4. Session Mapping: The phone number is used as the thread_id in LangGraph. This ensures every WhatsApp user has a completely isolated conversation history.
 
-Session Mapping: Use the phone number as the thread_id in LangGraph. This ensures that every WhatsApp user has their own isolated conversation memory.
+5. Async Processing: LLM inference can take 2-5 seconds, which may cause the Meta webhook to timeout. To solve this, I would use Background Tasks (via asyncio or Celery). The API immediately returns a 200 OK to Meta to acknowledge receipt, while the agent processes the logic asynchronously.
 
-Async Processing: Since LLM inference can take a few seconds (which might time out the Meta webhook), I would use a background task (using asyncio or Celery). The API immediately acknowledges the webhook with a 200 OK, while the agent processes the logic in the background.
-
-Response Delivery: Once the LangGraph agent generates a text response (or tool output), the system sends a POST request back to the Meta Graph API (/messages endpoint) to deliver the reply to the user's WhatsApp number.
-
-Author: Vaishnav Bhor
+6. Response Delivery: Once the LangGraph agent generates a response, the system sends a POST request to the Meta Graph API (/messages endpoint) to push the reply back to the user's specific WhatsApp number.
