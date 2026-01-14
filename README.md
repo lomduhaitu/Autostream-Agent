@@ -1,5 +1,5 @@
-Social-to-Lead AI Agent (Inflx)
-Company: ServiceHive | Product: Inflx
+**Social-to-Lead AI Agent (Inflx)**
+**Company: ServiceHive | Product: Inflx**
 
 1. Project Overview
 This project implements a Conversational AI Agent for video editing platform. The agent is designed to:
@@ -17,11 +17,13 @@ Python 3.9+
 A Google AI Studio API Key (for Gemini 1.5 Flash)
 
 Installation Steps
-Clone the Repository
+1. Clone the Repository
 
 Bash
 
 git clone <repository-url>
+2. Set directory
+
 cd AutoStream-Agent
 Create & Activate Virtual Environment
 
