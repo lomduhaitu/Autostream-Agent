@@ -84,5 +84,3 @@ State is persisted using LangGraph’s MemorySaver checkpointer.
 4. Generate: Gemini 1.5 Flash → Final Answer.
 
 Mechanism: The graph maintains a messages list within its state. Every user input and AI response is appended to this history.
-
-Persistence: A unique thread_id is assigned to every user session. This acts as "Short-Term Memory," allowing the LLM to recall previous turns (e.g., remembering the user's name mentioned 3 messages ago) to fill the required lead slots without asking redundant questions.
