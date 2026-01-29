@@ -1,9 +1,4 @@
-# Social-to-Lead AI Agent (Inflx)
-
-**Company:** ServiceHive | **Product:** Inflx  
-**Role:** Machine Learning Intern Assignment  
-**Author:** Vaishnav Bhor
-
+# Social-to-Lead AI Agent 
 ---
 
 ## 1. Project Overview
@@ -80,25 +75,3 @@ State is persisted using LangGraph’s MemorySaver checkpointer.
 Mechanism: The graph maintains a messages list within its state. Every user input and AI response is appended to this history.
 
 Persistence: A unique thread_id is assigned to every user session. This acts as "Short-Term Memory," allowing the LLM to recall previous turns (e.g., remembering the user's name mentioned 3 messages ago) to fill the required lead slots without asking redundant questions.
-
-
-**4. WhatsApp Deployment Strategy**
-
-
-To deploy this agent on WhatsApp, I would integrate it using the Meta Cloud API and a FastAPI middleware.
-
-**Architecture Flow**
-WhatsApp User → Meta Cloud → FastAPI Webhook → LangGraph Agent → Response
-
-**Implementation Plan**
-1. Webhook Setup: Develop a Python FastAPI application with a POST /webhook endpoint. This endpoint verifies the Meta verification token and receives incoming messages.
-
-2. Message Handling: When a webhook event triggers, the system extracts the JSON payload:
-
-3. Identity: The user's phone number (wa_id) is extracted.
-
-4. Session Mapping: The phone number is used as the thread_id in LangGraph. This ensures every WhatsApp user has a completely isolated conversation history.
-
-5. Async Processing: LLM inference can take 2-5 seconds, which may cause the Meta webhook to timeout. To solve this, I would use Background Tasks (via asyncio or Celery). The API immediately returns a 200 OK to Meta to acknowledge receipt, while the agent processes the logic asynchronously.
-
-6. Response Delivery: Once the LangGraph agent generates a response, the system sends a POST request to the Meta Graph API (/messages endpoint) to push the reply back to the user's specific WhatsApp number.
